@@ -1,3 +1,7 @@
 mysql-slow.log
 *.pyc
 build
+.Python
+bin
+lib
+include
