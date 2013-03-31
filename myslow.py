@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+from datetime import datetime
+import re
+
+SPACE = re.compile(r' +')
 
 
 class MySlow(object):
@@ -22,7 +26,11 @@ class MySlow(object):
                 if self.header is None:
                     self.header = {}
                 if line.startswith("# Time: "):
-                    self.time = line[8:-2]
+                    d, t = SPACE.split(line[8:-2])
+                    t = [int(a) for a in t.split(':')]
+                    self.time = datetime(
+                        2000 + int(d[:2]), int(d[2:4]), int(d[4:6]),
+                        t[0], t[1], t[2])
                     continue
                 if line.startswith("# User@Host: "):
                     u, h = line[13:-1].split(' @ ')
@@ -30,7 +38,6 @@ class MySlow(object):
                     self.header['host'] = h
                     continue
                 if line.startswith("# Query_time: "):
-                    # Query_time: 0  Lock_time: 0  Rows_sent: 0  Rows_examined: 164124
                     for value in line[2:-1].split("  "):
                         k, v = value.split(': ')
                         self.header[k] = int(v)
@@ -41,5 +48,5 @@ class MySlow(object):
 if __name__ == '__main__':
     with open('mysql-slow.log') as log:
         for time_, headers, command in MySlow(log):
-            if headers['Query_time'] > 0:
+            if headers['Query_time'] > 1:
                 print headers, command
