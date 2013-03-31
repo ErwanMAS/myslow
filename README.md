@@ -3,6 +3,19 @@ Myslow
 
 Read Mysql slow query log.
 
+Use it
+------
+
+You can use virtualenv
+
+    python setup.py build
+    python setup.py install
+
+Try it
+------
+
+    slowlog --input /var/log/mysql/mysql-slow.log --thresold 2
+
 Todo
 ----
 
