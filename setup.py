@@ -6,7 +6,7 @@ setup(name='MySlow',
       author='Mathieu Lecarme',
       author_email='mlecarme@bearstech.com',
       url='https://github.com/bearstech/myslow',
-      package_dir={'': 'lib'},
+      package_dir={'': 'src'},
       packages=['myslow', 'myslow.output'],
       scripts=['scripts/myslow']
       )
