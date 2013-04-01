@@ -32,7 +32,6 @@ class Carbon(object):
             self.port = 2003
         else:
             self.host, self.port = z
-        self.histo = Histogram()
 
     def __call__(self, log):
         #s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -40,11 +39,12 @@ class Carbon(object):
         first = None
         qt_max = 0
         re_max = 0
+        histo = Histogram()
         for t, h, c in log:
             ts = int(time.mktime(t.timetuple()))
             qt_max = max(qt_max, h['Query_time'])
             re_max = max(re_max, h['Rows_examined'])
-            self.histo.count(h['Query_time'])
+            histo.count(h['Query_time'])
             if first is None:
                 first = ts
             elif ts - first > self.sample:
@@ -54,10 +54,10 @@ class Carbon(object):
                 buff.write('.query_time.max %i %i\n' % (qt_max, first))
                 buff.write(self.prefix)
                 buff.write('.row_examined.max %i %i\n' % (re_max, first))
-                for t in self.histo.thresolds:
+                for t in histo.thresolds:
                     buff.write(self.prefix)
-                    buff.write('.%i.count %i %i\n' % (t, self.histo.values[t], first))
+                    buff.write('.%i.count %i %i\n' % (t, histo.values[t], first))
                 print buff.getvalue(),
                 qt_max = 0
                 re_max = 0
-                self.histo.reset()
+                histo.reset()
