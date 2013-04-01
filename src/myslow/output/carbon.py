@@ -57,7 +57,7 @@ class Carbon(object):
                 for t in histo.thresolds:
                     buff.write(self.prefix)
                     buff.write('.%i.count %i %i\n' % (t, histo.values[t], first))
-                print buff.getvalue(),
                 qt_max = 0
                 re_max = 0
                 histo.reset()
+                yield buff.getvalue()
