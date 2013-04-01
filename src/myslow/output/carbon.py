@@ -54,8 +54,10 @@ class Carbon(object):
                 buff.write('.query_time.max %i %i\n' % (qt_max, first))
                 buff.write(self.prefix)
                 buff.write('.row_examined.max %i %i\n' % (re_max, first))
+                for t in self.histo.thresolds:
+                    buff.write(self.prefix)
+                    buff.write('.%i.count %i %i\n' % (t, self.histo.values[t], first))
                 print buff.getvalue(),
-                #print ts, qt_max, re_max, self.histo.values
                 qt_max = 0
                 re_max = 0
                 self.histo.reset()
