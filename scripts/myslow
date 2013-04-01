@@ -8,7 +8,7 @@ parser = OptionParser()
 
 parser.add_option("-i", "--input",  dest="input",  help="Input")
 parser.add_option("-t", "--thresold", dest="thresold", help="Thresold", type="int", default=0)
-parser.add_option("-f", "--format", dest="format", help="Format", default="csv")
+parser.add_option("-f", "--format", dest="format", help="Format: csv|carbon", default="csv")
 parser.add_option("-o", "--output", dest="output", help="Output", default="-")
 
 (options, args) = parser.parse_args()
@@ -20,6 +20,9 @@ else:
 
 if options.format == "csv":
     from myslow.output.csv import output
+elif options.format == "carbon":
+    from myslow.output.carbon import Carbon
+    output = Carbon(options.output)
 
 
 def thresold(iterator):
