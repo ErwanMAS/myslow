@@ -2,6 +2,7 @@ from datetime import datetime
 import re
 
 SPACE = re.compile(r' +')
+KEY_VALUE = re.compile(r"(([^ ]+):\s+([0-9.]+))")
 
 
 class MySlow(object):
@@ -20,7 +21,7 @@ class MySlow(object):
                 self.commands.append(line[:-1])
             else:  # header
                 if len(self.commands):
-                    yield self.time, self.header, "\n".join(self.commands)
+                    yield self.time, self.header, normalize(" ".join(self.commands))
                     self.commands = []
                 if self.header is None:
                     self.header = {}
@@ -37,12 +38,14 @@ class MySlow(object):
                     self.header['host'] = h
                     continue
                 if line.startswith("# Query_time: "):
-                    for value in line[2:-1].split("  "):
-                        k, v = value.split(': ')
-                        self.header[k] = int(v)
+                    for _kv, k, v in KEY_VALUE.findall(line[2:-1]):
+                        self.header[k] = float(v)
                     continue
                 print "Unknow format :", line
 
+
+def normalize(sql):
+    return " ".join(SPACE.split(sql))
 
 if __name__ == '__main__':
     with open('mysql-slow.log') as log:
