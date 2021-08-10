@@ -12,17 +12,27 @@ class MySlow(object):
         self.state = 'header'
         self.time = None
         self.commands = []
+        self.database = None
 
     def __iter__(self):
         for line in self.source:
+            if line.startswith("SET timestamp="):
+                self.time=datetime.fromtimestamp(int(line[14:-2]))
+                continue
+            if line.startswith("use "):
+                self.database=line[4:-2]
+                continue
             if line[0] != '#':  # sql or first informations
                 if self.header is None:
                     continue
                 self.commands.append(line[:-1])
+                print " ". join(self.commands)
             else:  # header
                 if len(self.commands):
                     yield self.time, self.header, normalize(" ".join(self.commands))
                     self.commands = []
+                    self.time = None
+                    self.header = {}
                 if self.header is None:
                     self.header = {}
                 if line.startswith("# Time: "):
@@ -41,6 +51,16 @@ class MySlow(object):
                     for _kv, k, v in KEY_VALUE.findall(line[2:-1]):
                         self.header[k] = float(v)
                     continue
+                if line.startswith("# Schema: "):
+                    continue
+                if line.startswith("# Stored_routine: "):
+                    continue
+                if line.startswith("# Bytes_sent: "):
+                    continue
+                if line.startswith("# QC_Hit: "):
+                    continue
+                if line.startswith("# Filesort: "):
+                    continue
                 print "Unknow format :", line
 
 
@@ -49,6 +69,6 @@ def normalize(sql):
 
 if __name__ == '__main__':
     with open('mysql-slow.log') as log:
-        for time_, headers, command in MySlow(log):
+        for time, header, command in MySlow(log):
             if headers['Query_time'] > 1:
                 print headers, command
